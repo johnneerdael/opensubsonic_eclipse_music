@@ -46,21 +46,20 @@ token lives in `/data` and must be protected.
 
 ## Encryption at rest
 
-The JWT, Subsonic credentials and add-on capability URLs are AES-256-GCM
-encrypted in `library.db`. Provide the key outside the data volume:
+Encryption is mandatory. The JWT, Subsonic credentials and add-on capability URLs
+are AES-256-GCM encrypted in `library.db` using two shares:
 
-```sh
-DATA_KEY=<64 hex chars>
-# or
-DATA_KEY_FILE=/run/secrets/data_key
-```
+1. `<data>/install.key` — generated on first boot and stored with the data.
+2. a static code share embedded in the obfuscated image.
 
-If neither is set, `/data/data.key` is generated. A copied data directory then
-contains the key, so that only protects against casual file reads. Losing the key
-means re-signing in to Eclipse and re-adding add-ons; back it up separately.
+The random data key is wrapped with `scrypt(install.key, code share + salt)`, so
+the database alone cannot be read without the image, and the image alone cannot
+read it without the data. There is no user password and no `data.key`.
 
-This does not protect a running host (the key is in memory), and it does not
-protect the contract in the image.
+Keep `./data` and the image release together: losing `install.key`, or running an
+image built with a different code share, makes the JWT and capability URLs
+unrecoverable. This does not protect a running host (the key is in memory), and a
+technical analyst can extract the static code share.
 
 ## Credentials
 
