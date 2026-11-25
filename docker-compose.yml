@@ -15,7 +15,7 @@ services:
       CACHE_MAX_BYTES: ${CACHE_MAX_BYTES:-1073741824}
       REFRESH_MINUTES: ${REFRESH_MINUTES:-360}
       PUBLIC_URL: ${PUBLIC_URL:-}
-      BASE_PATH: ${BASE_PATH:-}
+      BASE_PATH: ${BASE_PATH:-/api}
       TZ: ${TZ:-UTC}
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4533/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
