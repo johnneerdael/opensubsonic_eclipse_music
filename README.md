@@ -44,6 +44,24 @@ store: the strings are decoded at runtime and can be recovered by dynamic
 analysis. Packet captures remain possible. The Eclipse account
 token lives in `/data` and must be protected.
 
+## Encryption at rest
+
+The JWT, Subsonic credentials and add-on capability URLs are AES-256-GCM
+encrypted in `library.db`. Provide the key outside the data volume:
+
+```sh
+DATA_KEY=<64 hex chars>
+# or
+DATA_KEY_FILE=/run/secrets/data_key
+```
+
+If neither is set, `/data/data.key` is generated. A copied data directory then
+contains the key, so that only protects against casual file reads. Losing the key
+means re-signing in to Eclipse and re-adding add-ons; back it up separately.
+
+This does not protect a running host (the key is in memory), and it does not
+protect the contract in the image.
+
 ## Credentials
 
 `ADMIN_PASSWORD` is required. `SUBSONIC_PASSWORD`/`SUBSONIC_API_KEY` are generated

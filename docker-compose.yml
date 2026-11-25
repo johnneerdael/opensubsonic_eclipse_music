@@ -16,6 +16,8 @@ services:
       REFRESH_MINUTES: ${REFRESH_MINUTES:-360}
       PUBLIC_URL: ${PUBLIC_URL:-}
       BASE_PATH: ${BASE_PATH:-/api}
+      DATA_KEY: ${DATA_KEY:-}
+      DATA_KEY_FILE: ${DATA_KEY_FILE:-}
       TZ: ${TZ:-UTC}
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4533/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
