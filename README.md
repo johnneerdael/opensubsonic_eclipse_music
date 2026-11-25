@@ -19,6 +19,27 @@ It is not a downloader or a replacement for Eclipse. It signs in to your account
 resolves Home, library and queue through the same add-ons, and serves the
 provider's FLAC bitstream to a normal Subsonic client.
 
+## Source and IP
+
+The source repository is private. This repository contains only the compose file
+and documentation, and the published image ships an obfuscated bundle with no
+source tree. The goal is to protect **eclipsemusic.app's intellectual property**
+as much as we reasonably can: keep a readable copy of the add-on contract out of
+circulation, the same way Eclipse ships compiled clients rather than source.
+
+Obfuscation raises the cost of casual extraction; it is not a technical or legal
+guarantee. Not affiliated with Eclipse Music; Eclipse's terms apply.
+
+## Validation scope
+
+Validated only with our **personal Eclipse supporter account and the paid
+supporter add-ons attached to it**. Not tested with free accounts, other add-ons,
+other regions, or libraries those providers do not carry.
+
+Matching depends on ISRC/search availability and a clear, non-DRM lossless
+stream. If your taste falls outside those catalogs, or a track exists only as a
+DRM stream, it may not resolve or play. No coverage or compatibility guarantee.
+
 ## The chain
 
 ```
