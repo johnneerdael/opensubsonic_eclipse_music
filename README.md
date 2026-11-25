@@ -1,8 +1,54 @@
 # Eclipse Subsonic — container distribution
 
-A Subsonic 1.16.1 / OpenSubsonic server for Eclipse Music accounts, distributed as
-a container image. **No source code is included in this repository or in the
-image**; the image contains an obfuscated, minified server bundle.
+**Bit-perfect Eclipse Music on Android, through USB Audio Player PRO.**
+
+## Why this exists
+
+Eclipse Music serves lossless FLAC from private add-ons, but on a **OnePlus 15
+with an iBasso DC4 Ultra DAC** the Eclipse app did not give us bit-perfect USB
+output. Other Android players, including **Flick**, did not manage it either. The
+one app in our testing that took control of the USB DAC and played the file's
+native sample rate and bit depth was **USB Audio Player PRO (UAPP)** by eXtream
+Software Development — the €8 app.
+
+UAPP supports OpenSubsonic, so the shortest reliable path was: keep Eclipse as
+the source, put its lossless streams behind a private OpenSubsonic server, and
+let UAPP's USB driver do the output. This image is that server.
+
+It is not a downloader or a replacement for Eclipse. It signs in to your account,
+resolves Home, library and queue through the same add-ons, and serves the
+provider's FLAC bitstream to a normal Subsonic client.
+
+## The chain
+
+```
+Eclipse account + private add-ons
+        │  authenticated, lossless FLAC
+        ▼
+eclipse-subsonic  ── HLS → FLAC stream copy, cache ──►  OpenSubsonic /api
+                                                              │
+                                                              ▼
+                                              USB Audio Player PRO
+                                                              │  custom USB driver
+                                                              ▼
+                                              iBasso DC4 Ultra DAC
+```
+
+## What "bit-perfect" means here
+
+- The gateway does not resample or re-encode on the direct path. HLS is
+  repackaged once with `ffmpeg -c:a copy`; progressive FLAC is cached
+  byte-for-byte.
+- UAPP must use its USB DAC output. EQ, normalization, Android mixing, or a
+  non-exclusive path can still alter the stream.
+- Verify with the DAC's sample-rate/bit-depth display. The gateway controls what
+  it serves; the phone/DAC chain controls what comes out.
+- Pulsar lossless can be Widevine-only. The gateway skips DRM and resolves the
+  same ISRC on a clear provider; it does not decrypt.
+
+This is one private Eclipse account on one private host. It is not a public
+service, a redistribution tool, or a way to make a non-bit-perfect app
+bit-perfect. Not affiliated with Eclipse, eXtream, or iBasso.
 
 - Image: `ghcr.io/johnneerdael/opensubsonic_eclipse_music:latest`
 - Platforms: `linux/amd64`, `linux/arm64`
@@ -25,6 +71,16 @@ Then open `http://<host>:4533/admin`:
 4. Copy the Subsonic URL, username and API key into your client.
 
 Client URL with the default compose file: `http://<host>:4533/api`.
+
+## UAPP setup
+
+1. Add a **Subsonic/OpenSubsonic** server in UAPP: URL `https://<host>/api`,
+   username `eclipse`, and the API key from `/admin` (or the password).
+2. Select the **USB DAC** as output and enable UAPP's direct/bit-perfect USB mode.
+3. Disable EQ, normalization, crossfade, and software volume/DSP you do not want
+   in the chain.
+4. Play a 16/44.1 and a 24/96 track. The DAC display should follow the file's
+   sample rate; if it stays at 48 kHz, something is still resampling.
 
 ## Behind Caddy
 
